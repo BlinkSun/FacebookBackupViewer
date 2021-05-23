@@ -13,6 +13,7 @@ namespace FacebookBackupViewer
         public string content;
         public string type;
         public bool is_unsent;
+        public int call_duration;
         public List<Photo> photos;
         public List<Reaction> reactions;
         public List<Gif> gifs;
