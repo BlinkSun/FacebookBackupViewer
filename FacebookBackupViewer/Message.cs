@@ -9,7 +9,7 @@ namespace FacebookBackupViewer
     public class Message
     {
         public string sender_name;
-        public string timestamp_ms;
+        public long timestamp_ms;
         public string content;
         public string type;
         public bool is_unsent;

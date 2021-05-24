@@ -14,43 +14,73 @@ namespace FacebookBackupViewer
 {
     public partial class frmMain : Form
     {
-        public event Action onLoadBackupStart;
         public frmMain()
         {
             InitializeComponent();
-            onLoadBackupStart += new Action(LoadBackupHandler);
         }
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            DialogResult result = openFileDialog.ShowDialog();
-            if(!string.IsNullOrEmpty(openFileDialog.FileName))
-            {
-                string filename = openFileDialog.FileName;
-                try
+            if (openFileDialog.ShowDialog() == DialogResult.OK) {
+                if (!string.IsNullOrEmpty(openFileDialog.FileName))
                 {
-                    using (StreamReader reader = new StreamReader(filename))
+                    string filename = openFileDialog.FileName;
+                    try
                     {
-                        string json = reader.ReadToEnd();
-                        Backup company = JsonConvert.DeserializeObject<Backup>(json);
-                        lblValide.ForeColor = Color.Green;
-                        lblValide.Text = "File Format Valide !";
+                        using (StreamReader reader = new StreamReader(filename))
+                        {
+                            string json = reader.ReadToEnd();
+                            Backup backup = JsonConvert.DeserializeObject<Backup>(json);
+                            lblValide.ForeColor = Color.Green;
+                            lblValide.Text = "File Format Valide !";
+                            fill(backup);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    lblValide.ForeColor = Color.Red;
-                    lblValide.Text = "File Format Invalide !";
-                    //MessageBox.Show(ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    catch (Exception)
+                    {
+                        lblValide.ForeColor = Color.Red;
+                        lblValide.Text = "File Format Invalide !";
+                        //MessageBox.Show(ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
 
-
-        private void LoadBackupHandler()
+        private void fill(Backup backup)
         {
-            throw;
+            lblParticipants.Text = $"Conversation entre {backup.participants[0].name} et {backup.participants[1].name}.";
+            int count = 0;
+            foreach (Message message in backup.messages)
+            {
+                count++;
+                if(message.type == "Generic")
+                {
+                    if(message.photos == null)
+                    {
+                        ucMessage ucmsg = new ucMessage(message);
+                        flowPanel.Controls.Add(ucmsg);
+                    }
+                }
+                //bool found = false;
+                //foreach (Control control in flowPanel.Controls)
+                //{
+                //    if(control.Text == message.type)
+                //    {
+                //        found = true;
+                //        break;
+                //    }
+                //}
+                //if (!found)
+                //{
+                //    Label label = new Label();
+                //    label.AutoSize = true;
+                //    label.Text = message.type;
+                //    flowPanel.Controls.Add(label);
+                //}
+                if (count == 100)
+                    break;
+            }
         }
     }
 }
